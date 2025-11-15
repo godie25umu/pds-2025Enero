@@ -4,8 +4,9 @@ import java.util.List;
 
 /**
  * Representa un usuario dentro del sistema.
- * Contiene un nombre de usuario (nickname), una contraseña y
- * una lista de cursos a los que el usuario está inscrito.
+ * Contiene un nombre de usuario (nickname), una contraseña,
+ * una lista de cursos a los que está inscrito, estadísticas
+ * asociadas al rendimiento del usuario y una estrategia asignada.
  */
 public class Usuario {
 	
@@ -24,7 +25,17 @@ public class Usuario {
      */
     private List<Curso> cursos;
 
-	private Estadísticas estadisticas;
+    /** 
+     * Estadísticas de rendimiento del usuario. 
+     */
+    private Estadísticas estadisticas;
+    
+    /** 
+     * Estrategia actual asignada al usuario. 
+     */
+    private Estrategia estrategia;
+    
+
     /**
      * Obtiene el nickname del usuario.
      * 
@@ -79,14 +90,40 @@ public class Usuario {
         this.cursos = cursos;
     }
 
-	public Estadísticas getEstadisticas() {
-		return estadisticas;
-	}
+    /**
+     * Obtiene las estadísticas del usuario.
+     * 
+     * @return un objeto {@code Estadísticas} con la información de rendimiento del usuario
+     */
+    public Estadísticas getEstadisticas() {
+        return estadisticas;
+    }
 
-	public void setEstadisticas(Estadísticas estadisticas) {
-		this.estadisticas = estadisticas;
-	}
-    
-    
+    /**
+     * Establece las estadísticas del usuario.
+     * 
+     * @param estadisticas el objeto de estadísticas a asignar
+     */
+    public void setEstadisticas(Estadísticas estadisticas) {
+        this.estadisticas = estadisticas;
+    }
+
+    /**
+     * Obtiene la estrategia que está utilizando el usuario.
+     * 
+     * @return la estrategia del usuario
+     */
+    public Estrategia getEstrategia() {
+        return estrategia;
+    }
+
+    /**
+     * Establece la estrategia del usuario.
+     * 
+     * @param estrategia la estrategia a asignar
+     */
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
+    }
 }
 
