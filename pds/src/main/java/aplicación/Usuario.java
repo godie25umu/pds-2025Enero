@@ -7,7 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-	
+	 /*
      * El nombre elegido por el usuario. 
      */
     private String nickname;
