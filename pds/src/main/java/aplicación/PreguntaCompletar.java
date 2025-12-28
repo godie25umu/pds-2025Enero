@@ -5,19 +5,29 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "preguntas_completar")
 public class PreguntaCompletar extends Pregunta {
+    public PreguntaCompletar() { 
+        super(); 
+    }
 
-    private String respuestaCorrecta;
-
-    public PreguntaCompletar() { super(); }
-
-    public PreguntaCompletar(String enunciado, String respuestaCorrecta) {
-        super(enunciado, respuestaCorrecta);
-        this.respuestaCorrecta = respuestaCorrecta;
+    public PreguntaCompletar(String enunciado, String respuesta) {
+        super(enunciado, respuesta);
     }
 
     @Override
     public boolean verificarRespuesta(String respuestaUsuario) {
         if (respuestaUsuario == null) return false;
-        return respuestaCorrecta.trim().equalsIgnoreCase(respuestaUsuario.trim());
+        return getRespuesta().trim().equalsIgnoreCase(respuestaUsuario.trim());
+    }
+
+    @Override
+    public Pregunta clone() {
+        PreguntaCompletar copia = new PreguntaCompletar(this.getPregunta(), this.getRespuesta());
+        copia.setBloque(this.getBloque());
+        return copia;
+    }
+
+    @Override
+    public Pregunta cloneSinId() {
+        return new PreguntaCompletar(this.getPregunta(), this.getRespuesta());
     }
 }

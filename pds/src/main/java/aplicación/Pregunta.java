@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="preguntas")
-public class Pregunta {
+public abstract class Pregunta {
 		
 	    @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +36,7 @@ public class Pregunta {
 			return respuesta;
 		}
 	    
-	    public boolean verificarRespuesta(String respuestaUsuario) {
-	    	return false;
-	    }
+	    public abstract boolean verificarRespuesta(String respuestaUsuario);
 
 		public String getPregunta() {
 			return pregunta;
@@ -61,14 +59,8 @@ public class Pregunta {
 		}
 
 		@Override
-		public Pregunta clone() {
-			Pregunta copia = new Pregunta(this.pregunta, this.respuesta);
-		    copia.setBloque(this.bloque);
-		    return copia;
-		}
+		public abstract Pregunta clone();
 		
-		public Pregunta cloneSinId() {
-			return new Pregunta(this.getPregunta(), this.getRespuesta());
-		}
+		public abstract Pregunta cloneSinId();
 }
 

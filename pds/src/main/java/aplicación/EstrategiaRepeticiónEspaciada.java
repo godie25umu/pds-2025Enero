@@ -1,5 +1,12 @@
 package aplicación;
 
-public class EstrategiaRepeticiónEspaciada {
+import java.util.List;
+import java.util.stream.Collectors;
 
+public class EstrategiaRepeticiónEspaciada implements Estrategia {
+    @Override
+    public List<Pregunta> aplicar(List<Pregunta> listaDePreguntas) {
+    	//falta por hacer
+        return listaDePreguntas.stream().collect(Collectors.toList());
+    }
 }
