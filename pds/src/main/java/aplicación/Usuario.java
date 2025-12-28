@@ -2,6 +2,7 @@ package aplicación;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Entity
@@ -13,6 +14,8 @@ public class Usuario {
     private String nickname;
     
     private String contraseña;
+    
+    private HashMap<Curso, ProgresoCurso> cursos = new HashMap<Curso, ProgresoCurso>();
     
     @Embedded 
     private Estadísticas estadisticas = new Estadísticas();
@@ -31,7 +34,6 @@ public class Usuario {
         joinColumns = @JoinColumn(name = "usuario_nickname"),
         inverseJoinColumns = @JoinColumn(name = "curso_id")
     )
-    private List<Curso> cursos = new ArrayList<>();
 
     @Transient 
     private Estrategia estrategia;
@@ -42,8 +44,8 @@ public class Usuario {
     public void setNickname(String nickname) { this.nickname = nickname; }
     public String getContraseña() { return contraseña; }
     public void setContraseña(String contraseña) { this.contraseña = contraseña; }
-    public List<Curso> getCursos() { return cursos; }
-    public void setCursos(List<Curso> cursos) { this.cursos = cursos; }
+    public HashMap<Curso, ProgresoCurso> getCursos() { return cursos; }
+    public void setCursos(HashMap<Curso, ProgresoCurso> cursos) { this.cursos = cursos; }
     public Estadísticas getEstadisticas() { return estadisticas; }
     public void setEstadisticas(Estadísticas estadisticas) { this.estadisticas = estadisticas; }
     public Estrategia getEstrategia() { return estrategia; }
