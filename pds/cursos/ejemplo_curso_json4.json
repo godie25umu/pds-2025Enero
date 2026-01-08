@@ -1,0 +1,43 @@
+{
+  "nombre": "Introducción a la Biología Celular",
+  "dominio": "Ciencias Naturales",
+  "bloques": [
+    {
+      "nombre": "La Célula Eucariota",
+      "preguntas": [
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué orgánulo es el encargado de la respiración celular?",
+          "respuesta": "Mitocondria",
+          "opciones": ["Ribosoma", "Lisosoma", "Mitocondria", "Aparato de Golgi"]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "El ADN en las células eucariotas se encuentra dentro del...",
+          "respuesta": "núcleo"
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Teoría Celular",
+          "informacion": "Propone que:\n1. Todos los seres vivos están formados por células.\n2. La célula es la unidad básica de la vida.\n3. Toda célula proviene de otra preexistente."
+        }
+      ]
+    },
+    {
+      "nombre": "Genética Básica",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Cómo se llama la unidad mínima de información genética?",
+          "respuesta": "gen"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuántos cromosomas tiene una célula humana somática?",
+          "respuesta": "46",
+          "opciones": ["23", "46", "12", "92"]
+        }
+      ]
+    }
+  ]
+}

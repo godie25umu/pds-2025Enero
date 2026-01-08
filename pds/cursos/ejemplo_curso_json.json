@@ -1,0 +1,158 @@
+{
+  "nombre": "Programación Java Básica",
+  "dominio": "Informática",
+  "bloques": [
+    {
+      "nombre": "Sintaxis Básica",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué palabra clave se usa para declarar una clase en Java?",
+          "respuesta": "class"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuál es el método principal de una aplicación Java?",
+          "respuesta": "public static void main(String[] args)",
+          "opciones": [
+            "public static void main(String[] args)",
+            "public void main(String[] args)",
+            "static void main(String args)",
+            "void main()"
+          ]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué símbolo se usa para terminar una sentencia en Java?",
+          "respuesta": ";"
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Comentarios en Java",
+          "informacion": "En Java hay tres tipos de comentarios:\n1. // comentario de una línea\n2. /* comentario multilínea */\n3. /** comentario de documentación Javadoc */"
+        }
+      ]
+    },
+    {
+      "nombre": "Variables y Tipos de Datos",
+      "preguntas": [
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué tipo de dato se usa para números enteros?",
+          "respuesta": "int",
+          "opciones": [
+            "int",
+            "float",
+            "string",
+            "boolean"
+          ]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué tipo de dato se usa para valores verdadero/falso?",
+          "respuesta": "boolean"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuál es el rango de valores de un byte en Java?",
+          "respuesta": "-128 a 127",
+          "opciones": [
+            "-128 a 127",
+            "0 a 255",
+            "-32768 a 32767",
+            "0 a 65535"
+          ]
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Tipos Primitivos",
+          "informacion": "Java tiene 8 tipos primitivos:\n- byte (8 bits)\n- short (16 bits)\n- int (32 bits)\n- long (64 bits)\n- float (32 bits)\n- double (64 bits)\n- char (16 bits)\n- boolean (1 bit)"
+        }
+      ]
+    },
+    {
+      "nombre": "Estructuras de Control",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué palabra clave se usa para un bucle condicional?",
+          "respuesta": "while"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuál de estos NO es un bucle en Java?",
+          "respuesta": "repeat",
+          "opciones": [
+            "for",
+            "while",
+            "do-while",
+            "repeat"
+          ]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué palabra clave se usa para salir de un bucle?",
+          "respuesta": "break"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué estructura permite múltiples opciones de ejecución basadas en el valor de una variable?",
+          "respuesta": "switch",
+          "opciones": [
+            "if-else",
+            "switch",
+            "while",
+            "for"
+          ]
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Estructura if-else",
+          "informacion": "La estructura if-else permite ejecutar código condicionalmente:\n\nif (condicion) {\n    // código si es verdadero\n} else {\n    // código si es falso\n}\n\nPuedes encadenar con else if para múltiples condiciones."
+        }
+      ]
+    },
+    {
+      "nombre": "Programación Orientada a Objetos",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué palabra clave se usa para crear una nueva instancia de una clase?",
+          "respuesta": "new"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuál NO es un pilar de la POO?",
+          "respuesta": "Compilación",
+          "opciones": [
+            "Encapsulación",
+            "Herencia",
+            "Polimorfismo",
+            "Compilación"
+          ]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué palabra clave se usa para heredar de una clase?",
+          "respuesta": "extends"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué modificador de acceso hace que un miembro sea accesible solo dentro de la misma clase?",
+          "respuesta": "private",
+          "opciones": [
+            "public",
+            "private",
+            "protected",
+            "default"
+          ]
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Constructores",
+          "informacion": "Un constructor es un método especial que se ejecuta al crear una instancia:\n\npublic class Persona {\n    private String nombre;\n    \n    // Constructor\n    public Persona(String nombre) {\n        this.nombre = nombre;\n    }\n}\n\nSi no defines constructor, Java crea uno vacío por defecto."
+        }
+      ]
+    }
+  ]
+}

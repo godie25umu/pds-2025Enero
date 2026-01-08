@@ -1,0 +1,43 @@
+{
+  "nombre": "Historia del Arte Universal",
+  "dominio": "Humanidades",
+  "bloques": [
+    {
+      "nombre": "El Renacimiento",
+      "preguntas": [
+        {
+          "tipo": "test",
+          "pregunta": "¿Quién pintó la 'Mona Lisa'?",
+          "respuesta": "Leonardo da Vinci",
+          "opciones": ["Miguel Ángel", "Rafael", "Leonardo da Vinci", "Donatello"]
+        },
+        {
+          "tipo": "completar",
+          "pregunta": "Técnica pictórica que consiste en difuminar los contornos para dar sensación de profundidad:",
+          "respuesta": "sfumato"
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Los Tres Grandes del Renacimiento",
+          "informacion": "1. Leonardo da Vinci (El polímata)\n2. Miguel Ángel (La fuerza y la escultura)\n3. Rafael (La armonía y la perfección)"
+        }
+      ]
+    },
+    {
+      "nombre": "Impresionismo",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿En qué siglo surgió el movimiento impresionista?",
+          "respuesta": "XIX"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué elemento es el más importante para los pintores impresionistas?",
+          "respuesta": "La luz",
+          "opciones": ["La luz", "La perspectiva lineal", "El dibujo preciso", "La mitología"]
+        }
+      ]
+    }
+  ]
+}

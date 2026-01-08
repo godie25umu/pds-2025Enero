@@ -1,0 +1,43 @@
+{
+  "nombre": "Fundamentos de la Cocina Italiana",
+  "dominio": "Gastronomía",
+  "bloques": [
+    {
+      "nombre": "Pastas y Masas",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Cómo se llama el punto de cocción de la pasta donde está firme al morder?",
+          "respuesta": "al dente"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Cuál es el ingrediente principal de los Gnocchi tradicionales?",
+          "respuesta": "Patata",
+          "opciones": ["Arroz", "Patata", "Garbanzos", "Maíz"]
+        },
+        {
+          "tipo": "tarjeta",
+          "pregunta": "Harina Tipo 00",
+          "informacion": "Es la harina más refinada en Italia. Tiene un alto contenido de gluten, lo que la hace ideal para pizzas y pastas frescas por su elasticidad."
+        }
+      ]
+    },
+    {
+      "nombre": "Salsas Clásicas",
+      "preguntas": [
+        {
+          "tipo": "completar",
+          "pregunta": "¿Qué fruto seco es esencial para un Pesto Genovese?",
+          "respuesta": "piñones"
+        },
+        {
+          "tipo": "test",
+          "pregunta": "¿Qué queso se usa tradicionalmente en la auténtica salsa Carbonara?",
+          "respuesta": "Pecorino Romano",
+          "opciones": ["Pecorino Romano", "Cheddar", "Gouda", "Brie"]
+        }
+      ]
+    }
+  ]
+}
