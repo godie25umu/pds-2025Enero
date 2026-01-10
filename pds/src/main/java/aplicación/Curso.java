@@ -17,13 +17,11 @@ public class Curso {
     
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BloqueDeContenido> bloques = new ArrayList<>();
+    
     @ManyToMany(mappedBy = "cursos")
     private List<Usuario> usuarios = new ArrayList<>();
 
-    // --- Constructores ---
-
     public Curso() {
-        // Requerido por JPA
     }
 
     public Curso(String nombre, String dominio) {
@@ -39,7 +37,7 @@ public class Curso {
      */
     public void agregarBloque(BloqueDeContenido bloque) {
         this.bloques.add(bloque);
-        bloque.setCurso(this); // Mantiene la integridad en la BD
+        bloque.setCurso(this);
     }
 
     /**
@@ -48,6 +46,16 @@ public class Curso {
     public void eliminarBloque(BloqueDeContenido bloque) {
         this.bloques.remove(bloque);
         bloque.setCurso(null);
+    }
+    
+    public void agregarUsuario(Usuario usuario) {
+        this.usuarios.add(usuario);
+        usuario.getProgresosPorCurso().put(this.getId(), new ProgresoCurso(0, 0));
+    }
+
+    public void eliminarUsuario(Usuario usuario) {
+        this.usuarios.remove(usuario);
+        usuario.getCursos().remove(this);
     }
 
     public Long getId() { return id; }

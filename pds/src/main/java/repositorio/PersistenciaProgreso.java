@@ -12,17 +12,12 @@ public class PersistenciaProgreso {
         this.em = em;
     }
 
-    /**
-     * Actualiza el progreso de un usuario en un curso específico.
-     * Al ser ProgresoCurso un @Embeddable, debemos persistir al Usuario.
-     */
     public void actualizarProgreso(String nickname, Curso curso, ProgresoCurso nuevoProgreso) {
         em.getTransaction().begin();
         try {
             Usuario usuario = em.find(Usuario.class, nickname);
             if (usuario != null) {
-                // Actualizamos o insertamos el progreso en el mapa del usuario
-                usuario.getCursos().put(curso, nuevoProgreso);
+                usuario.getProgresosPorCurso().put(curso.getId(), nuevoProgreso);
                 em.merge(usuario);
                 em.getTransaction().commit();
             } else {
