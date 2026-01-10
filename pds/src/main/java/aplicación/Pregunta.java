@@ -1,11 +1,25 @@
 package aplicación;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+
 import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="preguntas")
-public abstract class Pregunta {
+
+@JsonTypeInfo(
+	    use = JsonTypeInfo.Id.NAME, 
+	    include = JsonTypeInfo.As.PROPERTY, 
+	    property = "tipo" 
+	)
+	@JsonSubTypes({
+	    @JsonSubTypes.Type(value = PreguntaCompletar.class, name = "completar"),
+	    @JsonSubTypes.Type(value = PreguntaTest.class, name = "test"),
+	    @JsonSubTypes.Type(value = PreguntaTarjeta.class, name = "tarjeta")
+	})
+public abstract class Pregunta implements Cloneable{
 		
 	    @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)

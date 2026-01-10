@@ -3,6 +3,9 @@ package aplicación;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +20,7 @@ public class BloqueDeContenido {
 
     @ManyToOne
     @JoinColumn(name = "curso_id")
+    @JsonIgnore
     private Curso curso;
 
     @OneToMany(mappedBy = "bloque", cascade = CascadeType.ALL, orphanRemoval = true)
