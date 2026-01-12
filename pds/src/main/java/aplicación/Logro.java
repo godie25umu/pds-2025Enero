@@ -70,6 +70,20 @@ public class Logro {
     }
     
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Logro logro = (Logro) o;
+        if (id == null || logro.id == null) return false;
+        return id.equals(logro.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+    
+    @Override
     public String toString() {
         return "Logro{" +
                 "nombre='" + nombre + '\'' +
