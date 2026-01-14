@@ -19,17 +19,26 @@ public class Controlador {
     private EntityManager em;
     private RepositorioUsuario repoUsuario;
     private RepositorioCurso repoCurso;
+    private int indicePreguntaActual;
+    private RepositorioLogro repoLogro;
+
     
     private Usuario usuarioActual;
     private Curso cursoActual;
     private BloqueDeContenido bloqueActual;
+    private List<Pregunta> preguntasActuales;
     private final String CARPETA_CURSOS = "./cursos/";
   
-    
+    private int rachaActualSesion = 0;
+    private int mejorRachaSesion = 0;
+
+
     public Controlador() {
         this.em = Repositorio.getEntityManager();
         this.repoUsuario = new RepositorioUsuario(em);
         this.repoCurso = new RepositorioCurso(em);
+        this.repoLogro = new RepositorioLogro(em);
+        this.indicePreguntaActual = 0;
 
         
     }
@@ -88,6 +97,24 @@ public class Controlador {
         this.bloqueActual = null;
     }
     
+    private void cargarProgreso() {
+        if (usuarioActual != null && cursoActual != null) {
+            ProgresoCurso progreso = usuarioActual.getProgresoDeCurso(cursoActual);
+            if (progreso == null) {
+                progreso = new ProgresoCurso(0, 0);
+                usuarioActual.getProgresosPorCurso().put(cursoActual.getId(), progreso);
+            }
+        }
+    }
+    
+    public void seleccionarCurso(Curso curso) {
+        if (curso.getId() == null) {
+            repoCurso.guardar(curso); 
+        }
+        this.cursoActual = curso;
+        cargarProgreso();
+    }
+    
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -137,6 +164,176 @@ public class Controlador {
             }
         }
         return cursos;
+    }
+    
+    public Pregunta getPreguntaActual() {
+        if (preguntasActuales != null && indicePreguntaActual < preguntasActuales.size()) {
+            return preguntasActuales.get(indicePreguntaActual);
+        }
+        return null;
+    }
+    
+    public int getIndicePreguntaActual() {
+        return indicePreguntaActual + 1;
+    }
+    
+    public int getTotalPreguntas() {
+        return preguntasActuales != null ? preguntasActuales.size() : 0;
+    }
+    
+    public int getRachaActualSesion() {
+        return rachaActualSesion;
+    }
+    
+    public boolean verificarRespuesta(String respuestaUsuario) {
+        Pregunta preguntaActual = getPreguntaActual();
+        if (preguntaActual == null) return false;
+        
+        boolean esCorrecta = preguntaActual.verificarRespuesta(respuestaUsuario);
+        Estadísticas stats = usuarioActual.getEstadisticas();
+
+        if (esCorrecta) {
+            stats.registrarAcierto();
+            rachaActualSesion++;
+            
+            if (rachaActualSesion > mejorRachaSesion) {
+                mejorRachaSesion = rachaActualSesion;
+            }
+        } else {
+            stats.registrarFallo();
+            rachaActualSesion = 0;
+            
+            if (usuarioActual.getEstrategia() instanceof EstrategiaRepeticiónEspaciada) {
+                int posicionInsercion = Math.min(
+                    indicePreguntaActual + 3, 
+                    preguntasActuales.size()
+                );
+                preguntasActuales.add(posicionInsercion, preguntaActual);
+            }
+        }
+        
+        verificarYOtorgarLogros();
+        
+        repoUsuario.guardarUsuario(usuarioActual);
+        
+        return esCorrecta;
+    }
+    
+    private void verificarYOtorgarLogros() {
+        if (usuarioActual == null) return;
+        
+        Estadísticas stats = usuarioActual.getEstadisticas();
+        int totalPreguntas = stats.getTotalPreguntas();
+        int aciertos = stats.getNumAciertos();
+        float porcentaje = stats.getPorcentajeAciertos();
+        int nivel = stats.getNivelActual();
+        
+        // LOGROS DE PROGRESIÓN
+        if (aciertos >= 1) {
+            otorgarLogro("🌱 Primer Paso");
+        }
+        if (totalPreguntas >= 10) {
+            otorgarLogro("📚 Estudiante Novato");
+        }
+        if (totalPreguntas >= 50) {
+            otorgarLogro("📖 Aprendiz Dedicado");
+        }
+        if (totalPreguntas >= 100) {
+            otorgarLogro("🎓 Estudiante Avanzado");
+        }
+        if (totalPreguntas >= 250) {
+            otorgarLogro("🏆 Erudito");
+        }
+        if (totalPreguntas >= 500) {
+            otorgarLogro("🚀 Maestro del Conocimiento");
+        }
+        
+        // LOGROS DE PRECISIÓN
+        if (totalPreguntas >= 20 && porcentaje >= 70) {
+            otorgarLogro("🎯 Buen Ojo");
+        }
+        if (totalPreguntas >= 50 && porcentaje >= 90) {
+            otorgarLogro("💯 Perfeccionista");
+        }
+        
+        // LOGROS DE NIVEL
+        if (nivel >= 5) {
+            otorgarLogro("⭐ Nivel 5");
+        }
+        if (nivel >= 10) {
+            otorgarLogro("💎 Nivel 10");
+        }
+    
+    
+    }
+    
+    private void otorgarLogro(String nombreLogro) {
+        if (usuarioActual == null) return;
+        
+        Logro logro = repoLogro.buscarPorNombre(nombreLogro);
+        if (logro == null) return;
+        
+        boolean tieneLogro = usuarioActual.getLogros().stream()
+            .anyMatch(l -> l.getId().equals(logro.getId()));
+        
+        if (!tieneLogro) {
+            usuarioActual.getLogros().add(logro);
+            
+            // ⭐ AÑADIR XP DEL LOGRO
+            usuarioActual.getEstadisticas().añadirExperiencia(logro.getPuntos());
+            
+            repoUsuario.guardarUsuario(usuarioActual);
+            System.out.println("🎉 ¡Logro desbloqueado! " + nombreLogro + " (+" + logro.getPuntos() + " XP)");
+        }
+    }
+    
+    public boolean hayMasPreguntas() {
+        return preguntasActuales != null && indicePreguntaActual < preguntasActuales.size() - 1;
+    }
+    
+    public boolean siguientePregunta() {
+        if (preguntasActuales != null && indicePreguntaActual < preguntasActuales.size() - 1) {
+            indicePreguntaActual++;
+            return true;
+        }
+        return false;
+    }
+    
+    public void iniciarEstudioCompleto(Curso curso) {
+        this.cursoActual = curso;
+        this.bloqueActual = null;
+        
+        List<Pregunta> todasLasPreguntas = new ArrayList<>();
+        for (BloqueDeContenido bloque : curso.getBloques()) {
+            todasLasPreguntas.addAll(bloque.getPreguntas());
+        }
+        
+        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
+            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(todasLasPreguntas);
+        } else {
+            this.preguntasActuales = todasLasPreguntas;
+        }
+        
+        this.indicePreguntaActual = 0;
+        this.rachaActualSesion = 0;
+    }
+    
+    public int getMejorRachaSesion() {
+        return mejorRachaSesion;
+    }
+
+    public void iniciarEstudio(BloqueDeContenido bloque) {
+        this.bloqueActual = bloque;
+        List<Pregunta> preguntasDelBloque = new ArrayList<>(bloque.getPreguntas());
+        
+        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
+            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(preguntasDelBloque);
+        } else {
+            this.preguntasActuales = preguntasDelBloque;
+        }
+        
+        this.indicePreguntaActual = 0;
+        this.rachaActualSesion = 0;
     }
 
     public void importarCurso(File archivoOrigen) throws IOException {

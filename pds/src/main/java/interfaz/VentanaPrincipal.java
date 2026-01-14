@@ -275,6 +275,18 @@ public class VentanaPrincipal extends JFrame {
             JButton btnCurso = new JButton("<html><center><b>" + curso.getNombre() + "</b><br>" 
                                             + "<font color='gray'>" + curso.getDominio() + "</font></center></html>");
             btnCurso.setPreferredSize(new Dimension(150, 80));
+            btnCurso.addActionListener(e -> {
+                controlador.seleccionarCurso(curso);
+                
+                if (!curso.getBloques().isEmpty()) {
+                    new VentanaSeleccionBloque(controlador, curso).setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, 
+                        "Este curso no tiene bloques de contenido.", 
+                        "Aviso", 
+                        JOptionPane.WARNING_MESSAGE);
+                }
+            });
             panelGrid.add(btnCurso);
         }
 
