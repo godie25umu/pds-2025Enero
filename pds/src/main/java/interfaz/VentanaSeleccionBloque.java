@@ -60,7 +60,7 @@ public class VentanaSeleccionBloque extends JFrame {
         panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.Y_AXIS));
         panelBotones.setOpaque(false);
         
-        JButton btnContinuar = new JButton("▶ Continuar Curso");
+        JButton btnContinuar = new JButton("Continuar Curso");
         btnContinuar.setFont(new Font("Arial", Font.BOLD, 14));
         btnContinuar.setBackground(new Color(34, 139, 34));
         btnContinuar.setForeground(Color.WHITE);
