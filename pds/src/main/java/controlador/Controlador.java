@@ -177,6 +177,38 @@ public class Controlador {
         return indicePreguntaActual + 1;
     }
     
+    /**
+	Verifica si un bloque está completado
+     */
+    public boolean isBloqueCompletado(BloqueDeContenido bloque) {
+        if (usuarioActual == null || bloque == null || cursoActual == null) {
+            return false;
+        }
+        return usuarioActual.isBloqueCompletado(cursoActual.getNombre(), bloque.getNombre());
+    }
+    
+    
+    /**
+     Encuentra el primer bloque no completado de un curso
+     */
+    public BloqueDeContenido getPrimerBloqueNoCompletado(Curso curso) {
+        if (curso == null || curso.getBloques().isEmpty()) {
+            return null;
+        }
+        
+        for (BloqueDeContenido bloque : curso.getBloques()) {
+            if (!isBloqueCompletado(bloque) && !bloque.getPreguntas().isEmpty()) {
+                return bloque;
+            }
+        }
+        
+        // Si todos están completados, devolver el primero
+        return curso.getBloques().stream()
+            .filter(b -> !b.getPreguntas().isEmpty())
+            .findFirst()
+            .orElse(null);
+    }
+    
     public int getTotalPreguntas() {
         return preguntasActuales != null ? preguntasActuales.size() : 0;
     }

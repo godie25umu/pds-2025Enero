@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * Ventana para seleccionar un bloque de contenido de un curso antes de estudiar.
- * ACTUALIZADA: Incluye opción de Curso Completo con texto en negro.
  */
 public class VentanaSeleccionBloque extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -34,7 +33,7 @@ public class VentanaSeleccionBloque extends JFrame {
         panelPrincipal.setBackground(Color.WHITE);
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Panel superior con información del curso y botón de curso completo
+        // Panel superior con información del curso y botones
         JPanel panelSuperior = new JPanel(new BorderLayout(15, 10));
         panelSuperior.setBackground(new Color(240, 248, 255));
         panelSuperior.setBorder(BorderFactory.createCompoundBorder(
@@ -50,7 +49,7 @@ public class VentanaSeleccionBloque extends JFrame {
         lblDominio.setFont(new Font("Arial", Font.PLAIN, 14));
         lblDominio.setForeground(Color.GRAY);
         
-        JLabel lblInstruccion = new JLabel("Selecciona un bloque o estudia todo el contenido:");
+        JLabel lblInstruccion = new JLabel("Selecciona un bloque o continúa tu progreso:");
         lblInstruccion.setFont(new Font("Arial", Font.ITALIC, 12));
         
         JPanel panelTextos = new JPanel();
@@ -62,17 +61,43 @@ public class VentanaSeleccionBloque extends JFrame {
         panelTextos.add(Box.createRigidArea(new Dimension(0, 10)));
         panelTextos.add(lblInstruccion);
         
-        JButton btnCursoCompleto = new JButton("Curso Completo");
+        // Panel de botones de acción
+        JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.Y_AXIS));
+        panelBotones.setOpaque(false);
+        
+        // Botón Continuar Curso
+        JButton btnContinuar = new JButton("▶ Continuar Curso");
+        btnContinuar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnContinuar.setBackground(new Color(34, 139, 34));
+        btnContinuar.setForeground(Color.WHITE);
+        btnContinuar.setPreferredSize(new Dimension(180, 40));
+        btnContinuar.setMaximumSize(new Dimension(180, 40));
+        btnContinuar.setFocusPainted(false);
+        btnContinuar.setBorderPainted(false);
+        btnContinuar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnContinuar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnContinuar.addActionListener(e -> accionContinuarCurso());
+        
+        // Botón Curso Completo
+        JButton btnCursoCompleto = new JButton("📚 Curso Completo");
         btnCursoCompleto.setFont(new Font("Arial", Font.BOLD, 14));
         btnCursoCompleto.setBackground(new Color(70, 130, 180));
-        btnCursoCompleto.setForeground(Color.BLACK); 
-        btnCursoCompleto.setPreferredSize(new Dimension(180, 45));
+        btnCursoCompleto.setForeground(Color.BLACK);
+        btnCursoCompleto.setPreferredSize(new Dimension(180, 40));
+        btnCursoCompleto.setMaximumSize(new Dimension(180, 40));
         btnCursoCompleto.setFocusPainted(false);
+        btnCursoCompleto.setBorderPainted(false);
         btnCursoCompleto.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCursoCompleto.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCursoCompleto.addActionListener(e -> accionCursoCompleto());
         
+        panelBotones.add(btnContinuar);
+        panelBotones.add(Box.createRigidArea(new Dimension(0, 10)));
+        panelBotones.add(btnCursoCompleto);
+        
         panelSuperior.add(panelTextos, BorderLayout.CENTER);
-        panelSuperior.add(btnCursoCompleto, BorderLayout.EAST);
+        panelSuperior.add(panelBotones, BorderLayout.EAST);
         
         panelBloques = new JPanel();
         panelBloques.setLayout(new BoxLayout(panelBloques, BoxLayout.Y_AXIS));
@@ -86,6 +111,26 @@ public class VentanaSeleccionBloque extends JFrame {
         panelPrincipal.add(scrollPane, BorderLayout.CENTER);
         
         add(panelPrincipal);
+    }
+
+    /**
+     * NUEVO: Continúa el curso desde el primer bloque no completado
+     */
+    private void accionContinuarCurso() {
+        BloqueDeContenido bloqueNoCompletado = controlador.getPrimerBloqueNoCompletado(curso);
+        
+        if (bloqueNoCompletado == null) {
+            JOptionPane.showMessageDialog(this, 
+                "No hay bloques disponibles para continuar.\n" +
+                "¡Has completado todos los bloques o no hay preguntas!", 
+                "Aviso", 
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        controlador.iniciarEstudio(bloqueNoCompletado);
+        this.dispose();
+        new VentanaEstudio(controlador).setVisible(true);
     }
 
     private void accionCursoCompleto() {
@@ -120,7 +165,8 @@ public class VentanaSeleccionBloque extends JFrame {
         } else {
             for (int i = 0; i < bloques.size(); i++) {
                 BloqueDeContenido bloque = bloques.get(i);
-                JPanel panelBloque = crearTarjetaBloque(bloque, i + 1);
+                boolean completado = controlador.isBloqueCompletado(bloque);
+                JPanel panelBloque = crearTarjetaBloque(bloque, i + 1, completado);
                 panelBloques.add(panelBloque);
                 panelBloques.add(Box.createRigidArea(new Dimension(0, 10)));
             }
@@ -130,11 +176,19 @@ public class VentanaSeleccionBloque extends JFrame {
         panelBloques.repaint();
     }
     
-    private JPanel crearTarjetaBloque(BloqueDeContenido bloque, int numero) {
+    /**
+     * Crea una tarjeta de bloque con indicador de completado
+     */
+    private JPanel crearTarjetaBloque(BloqueDeContenido bloque, int numero, boolean completado) {
         JPanel panel = new JPanel(new BorderLayout(15, 10));
         panel.setBackground(Color.WHITE);
+        
+        // Color del borde según si está completado
+        Color colorBorde = completado ? new Color(255, 215, 0) : new Color(200, 200, 200);
+        int anchoBorde = completado ? 3 : 1;
+        
         panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+            BorderFactory.createLineBorder(colorBorde, anchoBorde, true),
             BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
@@ -143,9 +197,12 @@ public class VentanaSeleccionBloque extends JFrame {
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
         panelInfo.setOpaque(false);
         
-        JLabel lblNumero = new JLabel("Bloque " + numero);
+        // Etiqueta de número con icono de completado
+        JLabel lblNumero = new JLabel(
+            completado ? "✓ Bloque " + numero + " - COMPLETADO" : "Bloque " + numero
+        );
         lblNumero.setFont(new Font("Arial", Font.BOLD, 12));
-        lblNumero.setForeground(new Color(70, 130, 180));
+        lblNumero.setForeground(completado ? new Color(255, 215, 0) : new Color(70, 130, 180));
         
         JLabel lblNombre = new JLabel(bloque.getNombre());
         lblNombre.setFont(new Font("Arial", Font.BOLD, 18));
@@ -163,10 +220,11 @@ public class VentanaSeleccionBloque extends JFrame {
         panelInfo.add(Box.createRigidArea(new Dimension(0, 3)));
         panelInfo.add(lblPreguntas);
         
-        JButton btnIniciar = new JButton("Iniciar Bloque");
+        // Botón con texto diferente si está completado
+        JButton btnIniciar = new JButton(completado ? "Repasar" : "Iniciar Bloque");
         btnIniciar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnIniciar.setBackground(new Color(34, 139, 34));
-        btnIniciar.setForeground(Color.WHITE);
+        btnIniciar.setBackground(completado ? new Color(255, 215, 0) : new Color(34, 139, 34));
+        btnIniciar.setForeground(completado ? Color.BLACK : Color.WHITE);
         btnIniciar.setPreferredSize(new Dimension(150, 40));
         btnIniciar.setFocusPainted(false);
         btnIniciar.setBorderPainted(false);
@@ -174,7 +232,10 @@ public class VentanaSeleccionBloque extends JFrame {
         
         btnIniciar.addActionListener(e -> {
             if (bloque.getPreguntas().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Este bloque no tiene preguntas.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, 
+                    "Este bloque no tiene preguntas.", 
+                    "Aviso", 
+                    JOptionPane.WARNING_MESSAGE);
                 return;
             }
             controlador.iniciarEstudio(bloque);

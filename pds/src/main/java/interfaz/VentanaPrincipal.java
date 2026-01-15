@@ -10,10 +10,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 /**
- * Ventana principal MEJORADA:
- * - Muestra Nivel y Rango en lugar de Racha
- * - Dashboard con progreso de nivel
- * - Estadísticas actualizadas
+ * Ventana principal de la apliación
  */
 public class VentanaPrincipal extends JFrame {
     
