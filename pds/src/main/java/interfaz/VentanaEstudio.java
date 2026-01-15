@@ -5,12 +5,6 @@ import aplicación.*;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Ventana de estudio MEJORADA:
- * - Muestra racha de sesión actual
- * - Muestra XP ganada al finalizar
- * - Mejor feedback visual
- */
 public class VentanaEstudio extends JFrame {
     private static final long serialVersionUID = 1L;
     private Controlador controlador;
@@ -27,7 +21,6 @@ public class VentanaEstudio extends JFrame {
     private JRadioButton[] opcionesRadio;
     private ButtonGroup grupoOpciones;
     
-    // Tracking de XP ganada en esta sesión
     private int xpInicialSesion;
     
     public VentanaEstudio(Controlador controlador) {
@@ -42,7 +35,6 @@ public class VentanaEstudio extends JFrame {
             return;
         }
         
-        // Guardar XP inicial
         xpInicialSesion = controlador.getUsuarioActual().getEstadisticas().getExperienciaTotal();
         
         inicializarComponentes();
@@ -59,7 +51,6 @@ public class VentanaEstudio extends JFrame {
         panelPrincipal.setBackground(Color.WHITE);
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Panel superior (progreso + racha)
         JPanel panelSuperior = new JPanel(new BorderLayout(10, 10));
         panelSuperior.setBackground(Color.WHITE);
         
@@ -113,7 +104,6 @@ public class VentanaEstudio extends JFrame {
         lblResultado.setHorizontalAlignment(SwingConstants.CENTER);
         panelCentral.add(lblResultado, BorderLayout.SOUTH);
         
-        // Panel inferior
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         panelInferior.setBackground(Color.WHITE);
         
@@ -267,7 +257,6 @@ public class VentanaEstudio extends JFrame {
         String respuestaUsuario = obtenerRespuestaUsuario();
         boolean esCorrecta = controlador.verificarRespuesta(respuestaUsuario);
         
-        // Actualizar racha después de verificar
         actualizarRacha();
         
         if (esCorrecta) {
@@ -329,6 +318,7 @@ public class VentanaEstudio extends JFrame {
         if (controlador.siguientePregunta()) {
             cargarPregunta();
         } else {
+            controlador.finalizarSesionEstudio();
             mostrarResumen();
         }
     }

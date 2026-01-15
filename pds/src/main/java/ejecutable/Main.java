@@ -5,9 +5,6 @@ import interfaz.VentanaLogin;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-/**
- * Clase principal que inicia la aplicación Aprende Divertido 3000.
- */
 public class Main {
     
     public static void main(String[] args) {

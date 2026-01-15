@@ -13,38 +13,129 @@ import java.util.Base64;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 public class Controlador {
     
     private EntityManager em;
     private RepositorioUsuario repoUsuario;
     private RepositorioCurso repoCurso;
-    private int indicePreguntaActual;
+    private PersistenciaBloque repoBloque;
+    private PersistenciaProgreso repoProgreso;
     private RepositorioLogro repoLogro;
-
     
     private Usuario usuarioActual;
     private Curso cursoActual;
     private BloqueDeContenido bloqueActual;
     private List<Pregunta> preguntasActuales;
+    private int indicePreguntaActual;
     private final String CARPETA_CURSOS = "./cursos/";
-  
+    
     private int rachaActualSesion = 0;
     private int mejorRachaSesion = 0;
-
-
+    
+    private boolean estudiandoCursoCompleto = false;
+    
     public Controlador() {
         this.em = Repositorio.getEntityManager();
         this.repoUsuario = new RepositorioUsuario(em);
         this.repoCurso = new RepositorioCurso(em);
+        this.repoBloque = new PersistenciaBloque(em);
+        this.repoProgreso = new PersistenciaProgreso(em);
         this.repoLogro = new RepositorioLogro(em);
         this.indicePreguntaActual = 0;
-
         
+        inicializarLogrosPredefinidos();
     }
     
-   
-    // ==================== GESTIÓN DE USUARIOS ====================
+    private void inicializarLogrosPredefinidos() {
+        List<Logro> logrosExistentes = obtenerTodosLosLogros();
+        
+        if (logrosExistentes.isEmpty()) {
+            crearLogro("Primer Paso", "Responde tu primera pregunta correctamente", 10);
+            crearLogro("Estudiante Novato", "Responde 10 preguntas", 25);
+            crearLogro("Aprendiz Dedicado", "Responde 50 preguntas", 50);
+            crearLogro("Estudiante Avanzado", "Responde 100 preguntas", 100);
+            crearLogro("Erudito", "Responde 250 preguntas", 200);
+            crearLogro("Maestro del Conocimiento", "Responde 500 preguntas", 500);
+            
+            crearLogro("Buen Ojo", "Consigue un 70% de aciertos con al menos 20 preguntas", 75);
+            crearLogro("Perfeccionista", "Consigue un 90% de aciertos con al menos 50 preguntas", 150);
+            
+            crearLogro("Nivel 5", "Alcanza el nivel 5", 100);
+            crearLogro("Nivel 10", "Alcanza el nivel 10", 300);
+        }
+    }
+    
+    private void crearLogro(String nombre, String descripcion, int puntos) {
+        Logro logro = new Logro(nombre, descripcion, puntos);
+        repoLogro.guardar(logro);
+    }
+        
+    public List<Logro> obtenerTodosLosLogros() {
+        return repoLogro.obtenerTodos();
+    }
+    
+    private void otorgarLogro(String nombreLogro) {
+        if (usuarioActual == null) return;
+        
+        Logro logro = repoLogro.buscarPorNombre(nombreLogro);
+        if (logro == null) return;
+        
+        boolean tieneLogro = usuarioActual.getLogros().stream()
+            .anyMatch(l -> l.getId().equals(logro.getId()));
+        
+        if (!tieneLogro) {
+            usuarioActual.getLogros().add(logro);
+            
+            usuarioActual.getEstadisticas().añadirExperiencia(logro.getPuntos());
+            
+            repoUsuario.guardarUsuario(usuarioActual);
+            System.out.println("¡Logro desbloqueado! " + nombreLogro + " (+" + logro.getPuntos() + " XP)");
+        }
+    }
+
+    private void verificarYOtorgarLogros() {
+        if (usuarioActual == null) return;
+        
+        Estadísticas stats = usuarioActual.getEstadisticas();
+        int totalPreguntas = stats.getTotalPreguntas();
+        int aciertos = stats.getNumAciertos();
+        float porcentaje = stats.getPorcentajeAciertos();
+        int nivel = stats.getNivelActual();
+        
+        if (aciertos >= 1) {
+            otorgarLogro("Primer Paso");
+        }
+        if (totalPreguntas >= 10) {
+            otorgarLogro("Estudiante Novato");
+        }
+        if (totalPreguntas >= 50) {
+            otorgarLogro("Aprendiz Dedicado");
+        }
+        if (totalPreguntas >= 100) {
+            otorgarLogro("Estudiante Avanzado");
+        }
+        if (totalPreguntas >= 250) {
+            otorgarLogro("Erudito");
+        }
+        if (totalPreguntas >= 500) {
+            otorgarLogro("Maestro del Conocimiento");
+        }
+        
+        if (totalPreguntas >= 20 && porcentaje >= 70) {
+            otorgarLogro("Buen Ojo");
+        }
+        if (totalPreguntas >= 50 && porcentaje >= 90) {
+            otorgarLogro("Perfeccionista");
+        }
+        
+        if (nivel >= 5) {
+            otorgarLogro("Nivel 5");
+        }
+        if (nivel >= 10) {
+            otorgarLogro("Nivel 10");
+        }
+    }
+    
     
     public boolean registrarUsuario(String nickname, String contraseña) {
         try {
@@ -81,7 +172,8 @@ public class Controlador {
                 if (usuario.getEstrategia() == null) {
                     usuario.setEstrategia(new EstrategiaSecuencial());
                 }
-
+                this.rachaActualSesion = 0;
+                this.mejorRachaSesion = 0;
                 return true;
             }
             return false;
@@ -92,27 +184,15 @@ public class Controlador {
     }
     
     public void cerrarSesion() {
+        guardarProgresoActual();
         this.usuarioActual = null;
         this.cursoActual = null;
         this.bloqueActual = null;
-    }
-    
-    private void cargarProgreso() {
-        if (usuarioActual != null && cursoActual != null) {
-            ProgresoCurso progreso = usuarioActual.getProgresoDeCurso(cursoActual);
-            if (progreso == null) {
-                progreso = new ProgresoCurso(0, 0);
-                usuarioActual.getProgresosPorCurso().put(cursoActual.getId(), progreso);
-            }
-        }
-    }
-    
-    public void seleccionarCurso(Curso curso) {
-        if (curso.getId() == null) {
-            repoCurso.guardar(curso); 
-        }
-        this.cursoActual = curso;
-        cargarProgreso();
+        this.preguntasActuales = null;
+        this.indicePreguntaActual = 0;
+        this.rachaActualSesion = 0;
+        this.mejorRachaSesion = 0;
+        this.estudiandoCursoCompleto = false;
     }
     
     private String hashPassword(String password) {
@@ -129,7 +209,6 @@ public class Controlador {
         return hashPassword(password).equals(hash);
     }
     
-    // ==================== GESTIÓN DE CURSOS ====================
     
     public Curso crearCurso(String nombre, String dominio) {
         try {
@@ -142,7 +221,20 @@ public class Controlador {
         }
     }
     
-
+    public void seleccionarCurso(Curso curso) {
+        if (curso.getId() == null) {
+            repoCurso.guardar(curso); 
+        }
+        this.cursoActual = curso;
+        cargarProgreso();
+    }
+    
+    public void añadirBloqueAlCurso(BloqueDeContenido bloque) {
+        if (cursoActual != null) {
+            cursoActual.agregarBloque(bloque);
+            repoCurso.guardar(cursoActual);
+        }
+    }
     
     public List<Curso> obtenerCursosDesdeCarpeta() {
         List<Curso> cursos = new ArrayList<>();
@@ -165,56 +257,69 @@ public class Controlador {
         }
         return cursos;
     }
+
+    public void importarCurso(File archivoOrigen) throws IOException {
+        File destino = new File(CARPETA_CURSOS + archivoOrigen.getName());
+        java.nio.file.Files.copy(archivoOrigen.toPath(), destino.toPath(), 
+            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    }
+        
+    public BloqueDeContenido crearBloque(String nombre) {
+        try {
+            BloqueDeContenido bloque = new BloqueDeContenido(nombre);
+            repoBloque.guardar(bloque);
+            return bloque;
+        } catch (Exception e) {
+            System.err.println("Error al crear bloque: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    public void añadirPreguntaABloque(BloqueDeContenido bloque, Pregunta pregunta) {
+        bloque.agregarPregunta(pregunta);
+        repoBloque.guardar(bloque);
+    }
+    
+    public void iniciarEstudioCompleto(Curso curso) {
+        this.cursoActual = curso;
+        this.bloqueActual = null;
+        this.estudiandoCursoCompleto = true;
+        
+        List<Pregunta> todasLasPreguntas = new ArrayList<>();
+        for (BloqueDeContenido bloque : curso.getBloques()) {
+            todasLasPreguntas.addAll(bloque.getPreguntas());
+        }
+        
+        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
+            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(todasLasPreguntas);
+        } else {
+            this.preguntasActuales = todasLasPreguntas;
+        }
+        
+        this.indicePreguntaActual = 0;
+        this.rachaActualSesion = 0;
+    }
+
+    public void iniciarEstudio(BloqueDeContenido bloque) {
+        this.bloqueActual = bloque;
+        this.estudiandoCursoCompleto = false;
+        List<Pregunta> preguntasDelBloque = new ArrayList<>(bloque.getPreguntas());
+        
+        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
+            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(preguntasDelBloque);
+        } else {
+            this.preguntasActuales = preguntasDelBloque;
+        }
+        
+        this.indicePreguntaActual = 0;
+        this.rachaActualSesion = 0;
+    }
     
     public Pregunta getPreguntaActual() {
         if (preguntasActuales != null && indicePreguntaActual < preguntasActuales.size()) {
             return preguntasActuales.get(indicePreguntaActual);
         }
         return null;
-    }
-    
-    public int getIndicePreguntaActual() {
-        return indicePreguntaActual + 1;
-    }
-    
-    /**
-	Verifica si un bloque está completado
-     */
-    public boolean isBloqueCompletado(BloqueDeContenido bloque) {
-        if (usuarioActual == null || bloque == null || cursoActual == null) {
-            return false;
-        }
-        return usuarioActual.isBloqueCompletado(cursoActual.getNombre(), bloque.getNombre());
-    }
-    
-    
-    /**
-     Encuentra el primer bloque no completado de un curso
-     */
-    public BloqueDeContenido getPrimerBloqueNoCompletado(Curso curso) {
-        if (curso == null || curso.getBloques().isEmpty()) {
-            return null;
-        }
-        
-        for (BloqueDeContenido bloque : curso.getBloques()) {
-            if (!isBloqueCompletado(bloque) && !bloque.getPreguntas().isEmpty()) {
-                return bloque;
-            }
-        }
-        
-        // Si todos están completados, devolver el primero
-        return curso.getBloques().stream()
-            .filter(b -> !b.getPreguntas().isEmpty())
-            .findFirst()
-            .orElse(null);
-    }
-    
-    public int getTotalPreguntas() {
-        return preguntasActuales != null ? preguntasActuales.size() : 0;
-    }
-    
-    public int getRachaActualSesion() {
-        return rachaActualSesion;
     }
     
     public boolean verificarRespuesta(String respuestaUsuario) {
@@ -251,78 +356,6 @@ public class Controlador {
         return esCorrecta;
     }
     
-    private void verificarYOtorgarLogros() {
-        if (usuarioActual == null) return;
-        
-        Estadísticas stats = usuarioActual.getEstadisticas();
-        int totalPreguntas = stats.getTotalPreguntas();
-        int aciertos = stats.getNumAciertos();
-        float porcentaje = stats.getPorcentajeAciertos();
-        int nivel = stats.getNivelActual();
-        
-        // LOGROS DE PROGRESIÓN
-        if (aciertos >= 1) {
-            otorgarLogro("🌱 Primer Paso");
-        }
-        if (totalPreguntas >= 10) {
-            otorgarLogro("📚 Estudiante Novato");
-        }
-        if (totalPreguntas >= 50) {
-            otorgarLogro("📖 Aprendiz Dedicado");
-        }
-        if (totalPreguntas >= 100) {
-            otorgarLogro("🎓 Estudiante Avanzado");
-        }
-        if (totalPreguntas >= 250) {
-            otorgarLogro("🏆 Erudito");
-        }
-        if (totalPreguntas >= 500) {
-            otorgarLogro("🚀 Maestro del Conocimiento");
-        }
-        
-        // LOGROS DE PRECISIÓN
-        if (totalPreguntas >= 20 && porcentaje >= 70) {
-            otorgarLogro("🎯 Buen Ojo");
-        }
-        if (totalPreguntas >= 50 && porcentaje >= 90) {
-            otorgarLogro("💯 Perfeccionista");
-        }
-        
-        // LOGROS DE NIVEL
-        if (nivel >= 5) {
-            otorgarLogro("⭐ Nivel 5");
-        }
-        if (nivel >= 10) {
-            otorgarLogro("💎 Nivel 10");
-        }
-    
-    
-    }
-    
-    private void otorgarLogro(String nombreLogro) {
-        if (usuarioActual == null) return;
-        
-        Logro logro = repoLogro.buscarPorNombre(nombreLogro);
-        if (logro == null) return;
-        
-        boolean tieneLogro = usuarioActual.getLogros().stream()
-            .anyMatch(l -> l.getId().equals(logro.getId()));
-        
-        if (!tieneLogro) {
-            usuarioActual.getLogros().add(logro);
-            
-            // ⭐ AÑADIR XP DEL LOGRO
-            usuarioActual.getEstadisticas().añadirExperiencia(logro.getPuntos());
-            
-            repoUsuario.guardarUsuario(usuarioActual);
-            System.out.println("🎉 ¡Logro desbloqueado! " + nombreLogro + " (+" + logro.getPuntos() + " XP)");
-        }
-    }
-    
-    public boolean hayMasPreguntas() {
-        return preguntasActuales != null && indicePreguntaActual < preguntasActuales.size() - 1;
-    }
-    
     public boolean siguientePregunta() {
         if (preguntasActuales != null && indicePreguntaActual < preguntasActuales.size() - 1) {
             indicePreguntaActual++;
@@ -331,53 +364,108 @@ public class Controlador {
         return false;
     }
     
-    public void iniciarEstudioCompleto(Curso curso) {
-        this.cursoActual = curso;
-        this.bloqueActual = null;
+    public boolean hayMasPreguntas() {
+        return preguntasActuales != null && indicePreguntaActual < preguntasActuales.size() - 1;
+    }
+    
+    public void finalizarSesionEstudio() {
+        if (usuarioActual != null && bloqueActual != null && cursoActual != null) {
+            usuarioActual.marcarBloqueCompletado(cursoActual.getNombre(), bloqueActual.getNombre());
+            repoUsuario.guardarUsuario(usuarioActual);
+            System.out.println("Bloque completado: " + bloqueActual.getNombre() + 
+                             " del curso " + cursoActual.getNombre());
+        } else if (usuarioActual != null && estudiandoCursoCompleto && cursoActual != null) {
+            for (BloqueDeContenido bloque : cursoActual.getBloques()) {
+                usuarioActual.marcarBloqueCompletado(cursoActual.getNombre(), bloque.getNombre());
+            }
+            repoUsuario.guardarUsuario(usuarioActual);
+            System.out.println("Curso completo completado: " + cursoActual.getNombre());
+        }
+    }
+    
+    public boolean isBloqueCompletado(BloqueDeContenido bloque) {
+        if (usuarioActual == null || bloque == null || cursoActual == null) {
+            return false;
+        }
+        return usuarioActual.isBloqueCompletado(cursoActual.getNombre(), bloque.getNombre());
+    }
+    
+    public BloqueDeContenido getPrimerBloqueNoCompletado(Curso curso) {
+        if (curso == null || curso.getBloques().isEmpty()) {
+            return null;
+        }
         
-        List<Pregunta> todasLasPreguntas = new ArrayList<>();
         for (BloqueDeContenido bloque : curso.getBloques()) {
-            todasLasPreguntas.addAll(bloque.getPreguntas());
+            if (!isBloqueCompletado(bloque) && !bloque.getPreguntas().isEmpty()) {
+                return bloque;
+            }
         }
         
-        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
-            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(todasLasPreguntas);
-        } else {
-            this.preguntasActuales = todasLasPreguntas;
-        }
-        
-        this.indicePreguntaActual = 0;
-        this.rachaActualSesion = 0;
+        return curso.getBloques().stream()
+            .filter(b -> !b.getPreguntas().isEmpty())
+            .findFirst()
+            .orElse(null);
+    }
+    
+    public int getTotalPreguntas() {
+        return preguntasActuales != null ? preguntasActuales.size() : 0;
+    }
+    
+    public int getIndicePreguntaActual() {
+        return indicePreguntaActual + 1;
+    }
+    
+    public int getRachaActualSesion() {
+        return rachaActualSesion;
     }
     
     public int getMejorRachaSesion() {
         return mejorRachaSesion;
     }
-
-    public void iniciarEstudio(BloqueDeContenido bloque) {
-        this.bloqueActual = bloque;
-        List<Pregunta> preguntasDelBloque = new ArrayList<>(bloque.getPreguntas());
         
-        if (usuarioActual != null && usuarioActual.getEstrategia() != null) {
-            this.preguntasActuales = usuarioActual.getEstrategia().aplicar(preguntasDelBloque);
-        } else {
-            this.preguntasActuales = preguntasDelBloque;
+    private void cargarProgreso() {
+        if (usuarioActual != null && cursoActual != null) {
+            ProgresoCurso progreso = usuarioActual.getProgresoDeCurso(cursoActual);
+            if (progreso == null) {
+                progreso = new ProgresoCurso(0, 0);
+                usuarioActual.getProgresosPorCurso().put(cursoActual.getId(), progreso);
+            }
+        }
+    }
+    
+    private void guardarProgresoActual() {
+        if (usuarioActual != null && cursoActual != null) {
+            ProgresoCurso progreso = usuarioActual.getProgresoDeCurso(cursoActual);
+            if (progreso != null) {
+                repoProgreso.actualizarProgreso(
+                    usuarioActual.getNickname(), 
+                    cursoActual, 
+                    progreso
+                );
+            }
+        }
+    }
+        
+    public void cambiarEstrategia(String tipoEstrategia) {
+        if (usuarioActual == null) return;
+        
+        Estrategia nuevaEstrategia;
+        switch (tipoEstrategia.toLowerCase()) {
+            case "aleatoria":
+                nuevaEstrategia = new EstrategiaAleatoria();
+                break;
+            case "espaciada":
+                nuevaEstrategia = new EstrategiaRepeticiónEspaciada();
+                break;
+            case "secuencial":
+            default:
+                nuevaEstrategia = new EstrategiaSecuencial();
+                break;
         }
         
-        this.indicePreguntaActual = 0;
-        this.rachaActualSesion = 0;
+        usuarioActual.setEstrategia(nuevaEstrategia);
     }
-
-    public void importarCurso(File archivoOrigen) throws IOException {
-        File destino = new File(CARPETA_CURSOS + archivoOrigen.getName());
-        java.nio.file.Files.copy(archivoOrigen.toPath(), destino.toPath(), 
-            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-    }
-    
-   
-    
-    // ==================== GETTERS ====================
-    
+        
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }

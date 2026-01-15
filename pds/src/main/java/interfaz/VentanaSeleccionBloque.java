@@ -6,9 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-/**
- * Ventana para seleccionar un bloque de contenido de un curso antes de estudiar.
- */
 public class VentanaSeleccionBloque extends JFrame {
     private static final long serialVersionUID = 1L;
     private Controlador controlador;
@@ -28,12 +25,10 @@ public class VentanaSeleccionBloque extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        // Panel principal
         JPanel panelPrincipal = new JPanel(new BorderLayout(20, 20));
         panelPrincipal.setBackground(Color.WHITE);
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Panel superior con información del curso y botones
         JPanel panelSuperior = new JPanel(new BorderLayout(15, 10));
         panelSuperior.setBackground(new Color(240, 248, 255));
         panelSuperior.setBorder(BorderFactory.createCompoundBorder(
@@ -61,12 +56,10 @@ public class VentanaSeleccionBloque extends JFrame {
         panelTextos.add(Box.createRigidArea(new Dimension(0, 10)));
         panelTextos.add(lblInstruccion);
         
-        // Panel de botones de acción
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.Y_AXIS));
         panelBotones.setOpaque(false);
         
-        // Botón Continuar Curso
         JButton btnContinuar = new JButton("▶ Continuar Curso");
         btnContinuar.setFont(new Font("Arial", Font.BOLD, 14));
         btnContinuar.setBackground(new Color(34, 139, 34));
@@ -79,8 +72,7 @@ public class VentanaSeleccionBloque extends JFrame {
         btnContinuar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnContinuar.addActionListener(e -> accionContinuarCurso());
         
-        // Botón Curso Completo
-        JButton btnCursoCompleto = new JButton("📚 Curso Completo");
+        JButton btnCursoCompleto = new JButton("Curso Completo");
         btnCursoCompleto.setFont(new Font("Arial", Font.BOLD, 14));
         btnCursoCompleto.setBackground(new Color(70, 130, 180));
         btnCursoCompleto.setForeground(Color.BLACK);
@@ -113,9 +105,6 @@ public class VentanaSeleccionBloque extends JFrame {
         add(panelPrincipal);
     }
 
-    /**
-     * NUEVO: Continúa el curso desde el primer bloque no completado
-     */
     private void accionContinuarCurso() {
         BloqueDeContenido bloqueNoCompletado = controlador.getPrimerBloqueNoCompletado(curso);
         
@@ -175,15 +164,11 @@ public class VentanaSeleccionBloque extends JFrame {
         panelBloques.revalidate();
         panelBloques.repaint();
     }
-    
-    /**
-     * Crea una tarjeta de bloque con indicador de completado
-     */
+       
     private JPanel crearTarjetaBloque(BloqueDeContenido bloque, int numero, boolean completado) {
         JPanel panel = new JPanel(new BorderLayout(15, 10));
         panel.setBackground(Color.WHITE);
         
-        // Color del borde según si está completado
         Color colorBorde = completado ? new Color(255, 215, 0) : new Color(200, 200, 200);
         int anchoBorde = completado ? 3 : 1;
         
@@ -197,9 +182,8 @@ public class VentanaSeleccionBloque extends JFrame {
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
         panelInfo.setOpaque(false);
         
-        // Etiqueta de número con icono de completado
         JLabel lblNumero = new JLabel(
-            completado ? "✓ Bloque " + numero + " - COMPLETADO" : "Bloque " + numero
+            completado ? "Bloque " + numero + " - COMPLETADO" : "Bloque " + numero
         );
         lblNumero.setFont(new Font("Arial", Font.BOLD, 12));
         lblNumero.setForeground(completado ? new Color(255, 215, 0) : new Color(70, 130, 180));
@@ -220,7 +204,6 @@ public class VentanaSeleccionBloque extends JFrame {
         panelInfo.add(Box.createRigidArea(new Dimension(0, 3)));
         panelInfo.add(lblPreguntas);
         
-        // Botón con texto diferente si está completado
         JButton btnIniciar = new JButton(completado ? "Repasar" : "Iniciar Bloque");
         btnIniciar.setFont(new Font("Arial", Font.BOLD, 14));
         btnIniciar.setBackground(completado ? new Color(255, 215, 0) : new Color(34, 139, 34));

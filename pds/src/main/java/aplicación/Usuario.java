@@ -91,26 +91,17 @@ public class Usuario {
         }
     }
     
-    /**
-     * Genera una clave única para un bloque
-     */
     private String generarClaveBloque(String nombreCurso, String nombreBloque) {
         return nombreCurso + ":" + nombreBloque;
     }
     
-    /**
-     * Marca un bloque como completado
-     */
     public void marcarBloqueCompletado(String nombreCurso, String nombreBloque) {
         if (nombreCurso != null && nombreBloque != null) {
             String clave = generarClaveBloque(nombreCurso, nombreBloque);
             bloquesCompletados.add(clave);
         }
     }
-    
-    /**
-     * Verifica si un bloque está completado 
-     */
+
     public boolean isBloqueCompletado(String nombreCurso, String nombreBloque) {
         if (nombreCurso == null || nombreBloque == null) {
             return false;
@@ -119,16 +110,10 @@ public class Usuario {
         return bloquesCompletados.contains(clave);
     }
     
-    /**
-     * Obtiene todos los bloques completados
-     */
     public Set<String> getBloquesCompletados() {
         return bloquesCompletados;
     }
     
-    /**
-     * Resetea el progreso de un curso
-     */
     public void resetearProgresoCurso(Curso curso) {
         if (curso != null && curso.getNombre() != null) {
             bloquesCompletados.removeIf(clave -> clave.startsWith(curso.getNombre() + ":"));

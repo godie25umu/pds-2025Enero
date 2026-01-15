@@ -18,7 +18,6 @@ public class ProgresoCurso {
         this.ultimaActualizacion = LocalDateTime.now();
     }
 
-    // Getters y Setters
     public int getBloqueActual() { return bloqueActual; }
     public void setBloqueActual(int bloqueActual) { 
         this.bloqueActual = bloqueActual; 

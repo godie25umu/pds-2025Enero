@@ -5,9 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-/**
- * Ventana de inicio de sesión y registro de usuarios.
- */
 public class VentanaLogin extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private Controlador controlador;
@@ -29,13 +26,11 @@ public class VentanaLogin extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         
-        // Panel principal con fondo
         JPanel panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout(10, 10));
         panelPrincipal.setBackground(new Color(240, 248, 255));
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         
-        // Panel del título
         JPanel panelTitulo = new JPanel();
         panelTitulo.setBackground(new Color(240, 248, 255));
         JLabel lblTitulo = new JLabel("Aprende Divertido 3000");

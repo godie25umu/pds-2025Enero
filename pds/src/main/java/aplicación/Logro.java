@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Representa un logro que los usuarios pueden desbloquear.
- */
 @Entity
 @Table(name = "logros")
 public class Logro {

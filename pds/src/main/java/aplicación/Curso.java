@@ -32,17 +32,11 @@ public class Curso {
         this.dominio = dominio;
     }
 
-    /**
-     * Añade un bloque al curso y establece la relación inversa en el bloque.
-     */
     public void agregarBloque(BloqueDeContenido bloque) {
         this.bloques.add(bloque);
         bloque.setCurso(this);
     }
 
-    /**
-     * Elimina un bloque y rompe la relación inversa.
-     */
     public void eliminarBloque(BloqueDeContenido bloque) {
         this.bloques.remove(bloque);
         bloque.setCurso(null);

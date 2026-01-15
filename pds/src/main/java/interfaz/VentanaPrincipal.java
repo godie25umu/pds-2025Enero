@@ -9,9 +9,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
-/**
- * Ventana principal de la apliación
- */
 public class VentanaPrincipal extends JFrame {
     
     private static final long serialVersionUID = 1L;
@@ -63,7 +60,6 @@ public class VentanaPrincipal extends JFrame {
         Usuario usuario = controlador.getUsuarioActual();
         Estadísticas stats = usuario.getEstadisticas();
         
-        // Panel izquierdo con info del usuario
         JPanel panelInfo = new JPanel();
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
         panelInfo.setOpaque(false);
@@ -109,6 +105,7 @@ public class VentanaPrincipal extends JFrame {
         
         panel.add(crearBotonMenu("Inicio", e -> cargarDashboard()));
         panel.add(crearBotonMenu("Mis Cursos", e -> cargarCursos()));
+        panel.add(crearBotonMenu("Logros", e -> cargarLogros()));
         panel.add(crearBotonMenu("Estadísticas", e -> cargarEstadisticas()));
         panel.add(crearBotonMenu("Configuración", e -> cargarConfiguracion()));
         
@@ -143,22 +140,18 @@ public class VentanaPrincipal extends JFrame {
         boton.addActionListener(accion);
         return boton;
     }
-    
-    // ==================== CARGA DE CONTENIDO ====================
-    
+        
     private void cargarDashboard() {
         panelContenido.removeAll();
         
         JPanel dashboard = new JPanel(new BorderLayout(20, 20));
         dashboard.setBackground(Color.WHITE);
         
-        // Título con nivel
         Estadísticas stats = controlador.getUsuarioActual().getEstadisticas();
         JLabel titulo = new JLabel("Dashboard - " + stats.getRango());
         titulo.setFont(new Font("Arial", Font.BOLD, 28));
         titulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         
-        // Barra de progreso de nivel
         JPanel panelProgreso = new JPanel(new BorderLayout(10, 5));
         panelProgreso.setBackground(Color.WHITE);
         
@@ -193,7 +186,6 @@ public class VentanaPrincipal extends JFrame {
         
         dashboard.add(panelTitulo, BorderLayout.NORTH);
         
-        // Panel de tarjetas de estadísticas
         JPanel panelResumen = new JPanel(new GridLayout(2, 2, 15, 15));
         panelResumen.setBackground(Color.WHITE);
         
@@ -314,7 +306,10 @@ public class VentanaPrincipal extends JFrame {
         }
     }
     
-
+    private void cargarLogros() {
+        new VentanaLogros(controlador).setVisible(true);
+    }
+    
     private void cargarEstadisticas() {
         panelContenido.removeAll();
         
@@ -412,6 +407,16 @@ public class VentanaPrincipal extends JFrame {
         lblModoActivo.setFont(new Font("Arial", Font.ITALIC, 14));
         lblModoActivo.setForeground(new Color(70, 130, 180));
 
+        comboEstrategias.addActionListener(e -> {
+            String seleccion = (String) comboEstrategias.getSelectedItem();
+            controlador.cambiarEstrategia(seleccion);
+            lblModoActivo.setText(" (Modo activo: " + seleccion + ")");
+            
+            JOptionPane.showMessageDialog(this, 
+                "Estrategia cambiada a: " + seleccion, 
+                "Configuración", 
+                JOptionPane.INFORMATION_MESSAGE);
+        });
         
         panelEstrategia.add(comboEstrategias);
         panelEstrategia.add(lblModoActivo);
