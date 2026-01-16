@@ -1,69 +1,84 @@
 ```mermaid
 classDiagram
     class Usuario {
-        - String nombre
-        - String email
+        - String nickname
         - String contraseña
-        - int nivel
+        - Set~String~ bloquesCompletados
+        + inscribirseEnCurso(Curso)
+        + marcarBloqueCompletado(String, String)
     }
 
-    class EstrategiaAprendizaje {
+    class Estrategia {
+        <<interface>>
+        + aplicar(List~Pregunta~) List~Pregunta~
     }
 
-    class Secuencial {
-    }
-    class RepeticionEspaciada {
-    }
-    class Aleatoria {
-    }
+    class EstrategiaSecuencial { }
+    class EstrategiaAleatoria { }
+    class RepeticionEspaciada { }
 
     class Curso {
+        - Long id
         - String nombre
         - String dominio
     }
 
-    class BloqueContenido {
-        - String titulo
+    class BloqueDeContenido {
+        - Long id
+        - String nombre
     }
 
     class Pregunta {
-        - String enunciado
+        <<abstract>>
+        - Long id
+        - String pregunta
+        - String respuesta
+        + verificarRespuesta(String) boolean
     }
 
     class PreguntaTest {
-        - List<String> opciones
+        - List~String~ opciones
     }
 
-    class Completar {
-        - String respuestaCorrecta
-    }
+    class PreguntaCompletar { }
 
-    class Flashcard {
-        - String informacion
-    }
+    class PreguntaTarjeta { }
 
-    class Estadisticas {
+    class Estadísticas {
+        - int numAciertos
+        - int numFallos
+        - int experienciaTotal
         - int tiempoUso
-        - int mejorRacha
-        - logrosConseguidos
+        + getNivelActual() int
+        + getProgresoNivel() int
+    }
+
+    class ProgresoCurso {
+        - int bloqueActual
+        - int preguntaActual
+        - LocalDateTime ultimaActualizacion
     }
 
     class Logro {
+        - Long id
         - String nombre
         - String descripcion
-        - String icono
         - int puntos
     }
 
-    Usuario "(1,n)" -- "(0,n)" Curso : realiza
-    Curso "(1,n)" -- "(1,1)" BloqueContenido : contiene
-    BloqueContenido "(1,n)" -- "(1,1)" Pregunta : tiene
+    Usuario "*" -- "*" Curso : inscritos
+    Usuario "1" -- "1" Estadísticas : tiene
+    Usuario "1" -- "0..1" Estrategia : usa
+    Usuario "*" -- "*" Logro : obtiene
+    Usuario "1" -- "*" ProgresoCurso : rastrea
+    
+    Curso "1" -- "*" BloqueDeContenido : contiene
+    BloqueDeContenido "1" -- "*" Pregunta : tiene
+    
     Pregunta <|-- PreguntaTest
-    Pregunta <|-- Completar
-    Pregunta <|-- Flashcard
-    EstrategiaAprendizaje <|-- Secuencial
-    EstrategiaAprendizaje <|-- RepeticionEspaciada
-    EstrategiaAprendizaje <|-- Aleatoria
-    Usuario "(1,1)" -- "(1,1)" Estadisticas : tiene
-    Usuario "(1,1)" -- "(1,n)" EstrategiaAprendizaje : aplica
-    Usuario "(0,n)" -- "(0,n)" Logro : obtiene
+    Pregunta <|-- PreguntaCompletar
+    Pregunta <|-- PreguntaTarjeta
+    
+    Estrategia <|.. EstrategiaSecuencial
+    Estrategia <|.. EstrategiaAleatoria
+    Estrategia <|.. RepeticionEspaciada
