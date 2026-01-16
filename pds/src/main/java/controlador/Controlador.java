@@ -6,10 +6,7 @@ import jakarta.persistence.EntityManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -168,9 +165,7 @@ public class Controlador {
     public boolean iniciarSesion(String nickname, String contraseña) {
         try {
             Usuario usuario = repoUsuario.buscarPorNombre(nickname);
-            if (usuario != null &&
-            		//verificarPassword(contraseña, usuario.getContraseña()
-            				usuario.getContraseña().equals(contraseña)) {
+            if (usuario != null && usuario.getContraseña().equals(contraseña)) {
                 this.usuarioActual = usuario;
                 if (usuario.getEstrategia() == null) {
                     usuario.setEstrategia(new EstrategiaSecuencial());
@@ -196,24 +191,7 @@ public class Controlador {
         this.rachaActualSesion = 0;
         this.mejorRachaSesion = 0;
         this.estudiandoCursoCompleto = false;
-    }
-    
-    /*private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes());
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error al encriptar contraseña", e);
-        }
-    }
-    
-    private boolean verificarPassword(String password, String hash) {
-        return hashPassword(password).equals(hash);
-    }
-    
-    */
-    
+    } 
     
     public Curso crearCurso(String nombre, String dominio) {
         try {
