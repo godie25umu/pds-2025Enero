@@ -22,7 +22,7 @@ public class VentanaLogros extends JFrame {
         this.controlador = controlador;
         inicializarComponentes();
         cargarLogros();
-    }
+     }
     
     private void inicializarComponentes() {
         setTitle("Sala de Trofeos - Aprende Divertido 3000");

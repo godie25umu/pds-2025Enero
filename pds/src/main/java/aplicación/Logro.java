@@ -15,6 +15,7 @@ public class Logro {
     private String descripcion;
     private int puntos;
     
+    
     @ManyToMany(mappedBy = "logros")
     private List<Usuario> usuarios = new ArrayList<>();
 

@@ -99,6 +99,7 @@ public class Estadísticas {
         
         if (xpNecesaria == 0) return 0;
         return (xpProgreso * 100) / xpNecesaria;
+        
     }
     
     public String getRango() {

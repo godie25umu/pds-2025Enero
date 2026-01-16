@@ -18,14 +18,12 @@ class ControladorTest {
     @BeforeEach
     void setUp() {
         controlador = new Controlador();
-        // Limpiar cualquier usuario previo con este nombre si existe
         controlador.registrarUsuario(usuarioTest, passwordTest);
     }
 
     @AfterEach
     void tearDown() {
         if (controlador != null) {
-            // Solo cerrar el EntityManager, NO el Factory
             if (controlador.getEntityManager() != null && controlador.getEntityManager().isOpen()) {
                 controlador.getEntityManager().close();
             }
@@ -34,7 +32,6 @@ class ControladorTest {
     
     @AfterAll
     static void tearDownAll() {
-        // Cerrar el factory solo una vez al final de todos los tests
         Repositorio.cerrarFactory();
     }
 
@@ -282,8 +279,9 @@ class ControladorTest {
         assertEquals(2, controlador.getMejorRachaSesion());
         
         controlador.siguientePregunta();
+        
         controlador.verificarRespuesta("Incorrecta"); // Incorrecta
         assertEquals(0, controlador.getRachaActualSesion(), "La racha debe resetearse");
-        assertEquals(2, controlador.getMejorRachaSesion(), "La mejor racha se mantiene");
+        assertEquals(2, controlador.getMejorRachaSesion(), "La mejor debe mantenerse");
     }
 }

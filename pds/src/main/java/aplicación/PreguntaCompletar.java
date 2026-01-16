@@ -24,6 +24,7 @@ public class PreguntaCompletar extends Pregunta {
         PreguntaCompletar copia = new PreguntaCompletar(this.getPregunta(), this.getRespuesta());
         copia.setBloque(this.getBloque());
         return copia;
+        
     }
 
     @Override
