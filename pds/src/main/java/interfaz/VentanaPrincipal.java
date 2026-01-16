@@ -25,6 +25,7 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 controlador.cerrarSesion();
+                controlador.cerrar();
             }
         });
     }

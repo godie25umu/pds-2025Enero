@@ -152,7 +152,8 @@ public class Controlador {
             
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setNickname(nickname);
-            nuevoUsuario.setContraseña(hashPassword(contraseña));
+            //nuevoUsuario.setContraseña(hashPassword(contraseña));
+            nuevoUsuario.setContraseña(contraseña);
             nuevoUsuario.setEstadisticas(new Estadísticas());
             nuevoUsuario.setEstrategia(new EstrategiaSecuencial());
             
@@ -167,7 +168,9 @@ public class Controlador {
     public boolean iniciarSesion(String nickname, String contraseña) {
         try {
             Usuario usuario = repoUsuario.buscarPorNombre(nickname);
-            if (usuario != null && verificarPassword(contraseña, usuario.getContraseña())) {
+            if (usuario != null &&
+            		//verificarPassword(contraseña, usuario.getContraseña()
+            				usuario.getContraseña().equals(contraseña)) {
                 this.usuarioActual = usuario;
                 if (usuario.getEstrategia() == null) {
                     usuario.setEstrategia(new EstrategiaSecuencial());
@@ -195,7 +198,7 @@ public class Controlador {
         this.estudiandoCursoCompleto = false;
     }
     
-    private String hashPassword(String password) {
+    /*private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(password.getBytes());
@@ -208,6 +211,8 @@ public class Controlador {
     private boolean verificarPassword(String password, String hash) {
         return hashPassword(password).equals(hash);
     }
+    
+    */
     
     
     public Curso crearCurso(String nombre, String dominio) {
